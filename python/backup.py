@@ -1,20 +1,27 @@
+# =====================================================================
+# Program Name: Automated Network Configuration Backup Tool
+# Purpose: This program reads a list of network devices from an Excel file,
+# connects to each device using SSH, retrieves their current configuration,
+# and saves the configuration into individual text files for backup.
+# =====================================================================
+
 import os
 import openpyxl
 from netmiko import ConnectHandler
-# 导入特定的异常类，用于捕获设备连接错误
+# Import specific exceptions to handle network connection errors
 from netmiko.exceptions import NetmikoTimeoutException, NetmikoAuthenticationException
 
 def main():
-    # 定义输入文件和输出文件夹名称
+    # Define the names of the input file and the output folder
     excel_file = "devices.xlsx"
     output_dir = "Config_Backups"
 
-    # 检查输出文件夹是否存在，不存在则创建
+    # Check if the backup folder exists. If it doesn't, create it.
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
         print(f"Created directory: {output_dir}")
 
-    # 尝试读取 Excel 文件，如果文件不存在会报错
+    # Try to open the Excel file that contains the device list.
     try:
         workbook = openpyxl.load_workbook(excel_file)
         sheet = workbook.active
@@ -22,12 +29,13 @@ def main():
         print(f"Error: The file '{excel_file}' was not found. Please check the path.")
         return
 
-    # 遍历 Excel 的每一行，跳过第一行表头 (min_row=2)
+    # Loop through every row in the Excel sheet, skipping the header row.
     for row in sheet.iter_rows(min_row=2, values_only=True):
-        # 解包当前行的数据
+        
+        # Extract the data from the current row into separate variables
         device_name, ip, username, password, device_type = row
 
-        # 组装 Netmiko 连接字典
+        # Create a dictionary for Netmiko connection
         device_info = {
             'device_type': device_type,
             'host': ip,
@@ -37,34 +45,41 @@ def main():
 
         print(f"\nConnecting to {device_name} ({ip})...")
 
+        # Start a try block to handle potential network connection errors
         try:
-            # 建立 SSH 连接
+            # Establish an SSH connection to the network device
             net_connect = ConnectHandler(**device_info)
             
-            # 执行获取配置的命令（Cisco设备通常用 show running-config）
+            # Execute the command to fetch the configuration
             config_output = net_connect.send_command('show running-config')
             
-            # 保存配置到本地 txt 文件
+            # Create the full file path for saving
             file_path = os.path.join(output_dir, f"{device_name}_config.txt")
+            
+            # Save the configuration text inside the file
             with open(file_path, 'w') as file:
                 file.write(config_output)
                 
             print(f"Successfully saved {device_name} configuration to {file_path}")
             
-            # 断开连接
+            # Close the SSH connection
             net_connect.disconnect()
 
-        # 捕获连接超时错误（设备离线、IP填错）
+        # Catch timeout errors (e.g., device offline)
         except NetmikoTimeoutException:
-            print(f"Timeout error: {device_name} is unreachable. Skipping.")
-        # 捕获认证错误（账号密码错误）
+            print(f"Timeout error: {device_name} is unreachable. Skipping to next device.")
+            
+        # Catch authentication errors (e.g., wrong password)
         except NetmikoAuthenticationException:
-            print(f"Authentication failed for {device_name}. Skipping.")
-        # 捕获其他未知错误
+            print(f"Authentication failed for {device_name}. Check credentials. Skipping.")
+            
+        # Catch any other unexpected errors so the whole program doesn't crash
         except Exception as e:
             print(f"An unexpected error occurred with {device_name}: {e}")
 
-    print("\nBackup process completed.")
+    # Print a final message when all rows in the Excel file have been processed
+    print("\nBackup process completed. All devices processed.")
 
+# This ensures the main() function only runs if this script is executed directly
 if __name__ == "__main__":
     main()
