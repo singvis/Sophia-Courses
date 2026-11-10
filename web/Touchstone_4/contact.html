@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact - North Star Bakery</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- Navigation bar -->
+    <header>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="products.html">Products</a></li>
+                <li><a href="about.html">About Us</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h1>Contact Us</h1>
+        <p>Have a question? Want to pre-order something? Send us a message below.</p>
+
+        <!-- Form section based on Client A requirements -->
+        <!-- Added onsubmit="validateForm(event)" to trigger the JavaScript validation -->
+        <form action="#" method="POST" onsubmit="validateForm(event)">
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="pickup-date">Pickup Date (if applicable):</label>
+                <input type="date" id="pickup-date" name="pickup-date">
+            </div>
+
+            <div class="form-group">
+                <label>Request Type:</label>
+                <!-- Using a specific flexbox group to keep the radio buttons aligned horizontally -->
+                <div class="radio-group">
+                    <input type="radio" id="preorder" name="request_type" value="preorder">
+                    <label for="preorder" class="radio-label">Pre-order</label>
+
+                    <input type="radio" id="general" name="request_type" value="general">
+                    <label for="general" class="radio-label">General Question</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="notes">Additional Notes:</label>
+                <textarea id="notes" name="notes" rows="4"></textarea>
+            </div>
+
+            <!-- Added a div to display the custom JavaScript error messages -->
+            <div id="error-message" style="color: red; font-weight: bold; margin-bottom: 15px;"></div>
+
+            <button type="submit" class="btn">Send Message</button>
+        </form>
+
+        <h2 style="margin-top: 40px;">Location & Hours</h2>
+        <p>123 Main Street, Small Town, USA</p>
+        <p>Open Monday to Saturday, 7:00 AM - 5:00 PM. Closed on Sundays.</p>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 North Star Bakery. Open Mon-Sat 7am - 5pm.</p>
+    </footer>
+
+    <!-- Link to the JavaScript file so the validation works -->
+    <script src="script.js"></script>
+</body>
+</html>
